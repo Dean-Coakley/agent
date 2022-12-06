@@ -167,14 +167,11 @@ jobs:
           az logout
         if: always()
       - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
+        uses: alexellis/upload-assets@0.4.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ env.RELEASE_UPLOAD_URL }} 
-          asset_path: ./build/packages/nginx-agent.tar.gz
-          asset_name: nginx-agent.tar.gz
-          asset_content_type: application/zip
+          asset_paths: '["./build/*.deb", "./build/*.rpm", "./build/*.pkg", "./build/*.apk"]'
       - name: Publish Release Packages
         if: ${{ inputs.publishPackages == true }}
         env:
