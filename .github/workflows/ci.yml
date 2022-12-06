@@ -51,27 +51,27 @@ jobs:
       - name: Run Component Tests
         run: make component-test
 
-  performance-test:
-    name: Performance Tests
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Docker Build
-        uses: docker/setup-buildx-action@v2
-      - name: Build Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          file: test/docker/Dockerfile
-          tags: nginx-agent-benchmark:1.0.0
-          context: '.'
-          push: false
-          load: true
-          no-cache: true
-          secrets: |
-            "nginx-crt=${{ secrets.NGINX_CRT }}"
-            "nginx-key=${{ secrets.NGINX_KEY }}"
-      - name: Run Performance Tests
-        run: docker run -v ${GITHUB_WORKSPACE}:/home/nginx/ --rm nginx-agent-benchmark:1.0.0
+  # performance-test:
+  #   name: Performance Tests
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Set up Docker Build
+  #       uses: docker/setup-buildx-action@v2
+  #     - name: Build Docker Image
+  #       uses: docker/build-push-action@v3
+  #       with:
+  #         file: test/docker/Dockerfile
+  #         tags: nginx-agent-benchmark:1.0.0
+  #         context: '.'
+  #         push: false
+  #         load: true
+  #         no-cache: true
+  #         secrets: |
+  #           "nginx-crt=${{ secrets.NGINX_CRT }}"
+  #           "nginx-key=${{ secrets.NGINX_KEY }}"
+  #     - name: Run Performance Tests
+  #       run: docker run -v ${GITHUB_WORKSPACE}:/home/nginx/ --rm nginx-agent-benchmark:1.0.0
 
   build-snapshot:
     name: Build Snapshot
@@ -132,6 +132,6 @@ jobs:
 
   trigger-release-workflow:
     if: startsWith(github.ref, 'refs/heads/release-')
-    needs: [ lint, unit-test, component-test, performance-test ]
+    needs: [ lint, unit-test, component-test]
     uses: ./.github/workflows/release-branch.yml
     secrets: inherit
