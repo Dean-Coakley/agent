@@ -73,62 +73,62 @@ jobs:
   #     - name: Run Performance Tests
   #       run: docker run -v ${GITHUB_WORKSPACE}:/home/nginx/ --rm nginx-agent-benchmark:1.0.0
 
-  build-snapshot:
-    name: Build Snapshot
-    runs-on: ubuntu-22.04
-    if: ${{ !startsWith(github.ref, 'refs/heads/release-') }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: 'go.mod'
-      - name: Setup build environment
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gpgv1 monkeysphere 
-          go install github.com/goreleaser/nfpm/v2/cmd/nfpm@v2.18.0
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Build Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          file: scripts/packages/packager/Dockerfile
-          tags: build-signed-packager:1.0.0
-          context: '.'
-          push: false
-          load: true
-          no-cache: true
-          build-args: |
-            package_type=signed-package
-      - name: Build Packages
-        env:
-          INDIGO_GPG_AGENT: ${{ secrets.INDIGO_GPG_AGENT }}
-          NFPM_SIGNING_KEY_FILE: .key.asc
-        run: |
-          echo "$INDIGO_GPG_AGENT" | base64 --decode > .key.asc
-          make clean package
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: nginx-agent-snapshots
-          path: ./build/packages/nginx-agent.tar.gz
-          retention-days: 3
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Azure Upload Snapshot
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az storage blob upload --auth-mode=login -f ./build/packages/nginx-agent.tar.gz -c ${{ secrets.AZURE_CONTAINER_NAME }} \
-              --account-name ${{ secrets.AZURE_ACCOUNT_NAME }} --overwrite -n nginx-agent/${GITHUB_REF##*/}/nginx-agent.tar.gz
-      - name: Azure Logout
-        run: |
-          az logout
-        if: always()
+  # build-snapshot:
+  #   name: Build Snapshot
+  #   runs-on: ubuntu-22.04
+  #   if: ${{ !startsWith(github.ref, 'refs/heads/release-') }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version-file: 'go.mod'
+  #     - name: Setup build environment
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y gpgv1 monkeysphere 
+  #         go install github.com/goreleaser/nfpm/v2/cmd/nfpm@v2.18.0
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
+  #     - name: Build Docker Image
+  #       uses: docker/build-push-action@v3
+  #       with:
+  #         file: scripts/packages/packager/Dockerfile
+  #         tags: build-signed-packager:1.0.0
+  #         context: '.'
+  #         push: false
+  #         load: true
+  #         no-cache: true
+  #         build-args: |
+  #           package_type=signed-package
+  #     - name: Build Packages
+  #       env:
+  #         INDIGO_GPG_AGENT: ${{ secrets.INDIGO_GPG_AGENT }}
+  #         NFPM_SIGNING_KEY_FILE: .key.asc
+  #       run: |
+  #         echo "$INDIGO_GPG_AGENT" | base64 --decode > .key.asc
+  #         make clean package
+  #     - name: Upload Artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: nginx-agent-snapshots
+  #         path: ./build/packages/nginx-agent.tar.gz
+  #         retention-days: 3
+  #     - name: Azure Login
+  #       uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
+  #     - name: Azure Upload Snapshot
+  #       uses: azure/CLI@v1
+  #       with:
+  #         inlineScript: |
+  #           az storage blob upload --auth-mode=login -f ./build/packages/nginx-agent.tar.gz -c ${{ secrets.AZURE_CONTAINER_NAME }} \
+  #             --account-name ${{ secrets.AZURE_ACCOUNT_NAME }} --overwrite -n nginx-agent/${GITHUB_REF##*/}/nginx-agent.tar.gz
+  #     - name: Azure Logout
+  #       run: |
+  #         az logout
+  #       if: always()
 
   trigger-release-workflow:
     if: startsWith(github.ref, 'refs/heads/release-')
