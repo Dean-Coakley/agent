@@ -8,70 +8,70 @@ env:
   NFPM_VERSION: 'v2.18.1'
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Lint Agent Code
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: "${{ env.GOLANGCI_LINT_VERSION }}"
-          args: -c ./scripts/.golangci.yml
-      - name: Lint SDK Code
-        uses: golangci/golangci-lint-action@v3
-        with:
-          version: "${{ env.GOLANGCI_LINT_VERSION }}"
-          working-directory: sdk
-          args: -c ../scripts/.golangci.yml
+  # lint:
+  #   name: Lint
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Lint Agent Code
+  #       uses: golangci/golangci-lint-action@v3
+  #       with:
+  #         version: "${{ env.GOLANGCI_LINT_VERSION }}"
+  #         args: -c ./scripts/.golangci.yml
+  #     - name: Lint SDK Code
+  #       uses: golangci/golangci-lint-action@v3
+  #       with:
+  #         version: "${{ env.GOLANGCI_LINT_VERSION }}"
+  #         working-directory: sdk
+  #         args: -c ../scripts/.golangci.yml
 
-  unit-test:
-    name: Unit Tests
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: 'go.mod'
-      - name: Run Unit Tests
-        run: make unit-test
-      - name: Upload Test Coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./build/test/coverage.out
+  # unit-test:
+  #   name: Unit Tests
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version-file: 'go.mod'
+  #     - name: Run Unit Tests
+  #       run: make unit-test
+  #     - name: Upload Test Coverage
+  #       uses: codecov/codecov-action@v3
+  #       with:
+  #         files: ./build/test/coverage.out
 
-  component-test:
-    name: Component Tests
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version-file: 'go.mod'
-      - name: Run Component Tests
-        run: make component-test
+  # component-test:
+  #   name: Component Tests
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-go@v3
+  #       with:
+  #         go-version-file: 'go.mod'
+  #     - name: Run Component Tests
+  #       run: make component-test
 
-  performance-test:
-    name: Performance Tests
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Docker Build
-        uses: docker/setup-buildx-action@v2
-      - name: Build Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          file: test/docker/Dockerfile
-          tags: nginx-agent-benchmark:1.0.0
-          context: '.'
-          push: false
-          load: true
-          no-cache: true
-          secrets: |
-            "nginx-crt=${{ secrets.NGINX_CRT }}"
-            "nginx-key=${{ secrets.NGINX_KEY }}"
-      - name: Run Performance Tests
-        run: docker run -v ${GITHUB_WORKSPACE}:/home/nginx/ --rm nginx-agent-benchmark:1.0.0
+  # performance-test:
+  #   name: Performance Tests
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Set up Docker Build
+  #       uses: docker/setup-buildx-action@v2
+  #     - name: Build Docker Image
+  #       uses: docker/build-push-action@v3
+  #       with:
+  #         file: test/docker/Dockerfile
+  #         tags: nginx-agent-benchmark:1.0.0
+  #         context: '.'
+  #         push: false
+  #         load: true
+  #         no-cache: true
+  #         secrets: |
+  #           "nginx-crt=${{ secrets.NGINX_CRT }}"
+  #           "nginx-key=${{ secrets.NGINX_KEY }}"
+  #     - name: Run Performance Tests
+  #       run: docker run -v ${GITHUB_WORKSPACE}:/home/nginx/ --rm nginx-agent-benchmark:1.0.0
 
   build-snapshot:
     name: Build Snapshot
@@ -132,6 +132,6 @@ jobs:
 
   trigger-release-workflow:
     if: startsWith(github.ref, 'refs/heads/release-')
-    needs: [ lint, unit-test, component-test, performance-test ]
+    # needs: [ lint, unit-test, component-test, performance-test ]
     uses: ./.github/workflows/release-branch.yml
     secrets: inherit

@@ -132,56 +132,55 @@ jobs:
         run: |
           git push origin "v${{env.VERSION}}"
           git push origin "sdk/v${{env.VERSION}}"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Build Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          file: scripts/packages/packager/Dockerfile
-          tags: build-signed-packager:1.0.0
-          context: '.'
-          push: false
-          load: true
-          no-cache: true
-          build-args: |
-            package_type=signed-package
-      - name: Build Packages
-        env:
-          INDIGO_GPG_AGENT: ${{ secrets.INDIGO_GPG_AGENT }}
-          NFPM_SIGNING_KEY_FILE: .key.asc
-        run: |
-          echo "$INDIGO_GPG_AGENT" | base64 --decode > .key.asc
-          make clean package
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Azure Upload Release Packages
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az storage blob upload --auth-mode=login -f ./build/packages/nginx-agent.tar.gz -c ${{ secrets.AZURE_CONTAINER_NAME }} \
-              --account-name ${{ secrets.AZURE_ACCOUNT_NAME }} --overwrite -n nginx-agent/${GITHUB_REF##*/}/nginx-agent.tar.gz
-      - name: Azure Logout
-        run: |
-          az logout
-        if: always()
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
+      # - name: Build Docker Image
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     file: scripts/packages/packager/Dockerfile
+      #     tags: build-signed-packager:1.0.0
+      #     context: '.'
+      #     push: false
+      #     load: true
+      #     no-cache: true
+      #     build-args: |
+      #       package_type=signed-package
+      # - name: Build Packages
+      #   env:
+      #     INDIGO_GPG_AGENT: ${{ secrets.INDIGO_GPG_AGENT }}
+      #     NFPM_SIGNING_KEY_FILE: .key.asc
+      #   run: |
+      #     echo "$INDIGO_GPG_AGENT" | base64 --decode > .key.asc
+      #     make clean package
+      # - name: Azure Login
+      #   uses: azure/login@v1
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # - name: Azure Upload Release Packages
+      #   uses: azure/CLI@v1
+      #   with:
+      #     inlineScript: |
+      #       az storage blob upload --auth-mode=login -f ./build/packages/nginx-agent.tar.gz -c ${{ secrets.AZURE_CONTAINER_NAME }} \
+      #         --account-name ${{ secrets.AZURE_ACCOUNT_NAME }} --overwrite -n nginx-agent/${GITHUB_REF##*/}/nginx-agent.tar.gz
+      # - name: Azure Logout
+      #   run: |
+      #     az logout
+      #   if: always()
+      - name: Upload
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ env.RELEASE_UPLOAD_URL }} 
-          asset_path: ./build/packages/nginx-agent.tar.gz
-          asset_name: nginx-agent.tar.gz
-          asset_content_type: application/zip
-      - name: Publish Release Packages
-        if: ${{ inputs.publishPackages == true }}
-        env:
-          AGENT_UPLOADER_PEM: ${{ secrets.AGENT_UPLOADER_PEM }}
         run: |
-          echo $AGENT_UPLOADER_PEM | base64 --decode > agent-uploader.pem
-          make release
+          tag_name="${GITHUB_REF##*/}"
+          mkdir -p build/deb build/rpm
+          touch build/deb/nginx-agent_2.20.0~bionic_arm64.deb; touch build/rpm/nginx-agent-2.20.0.el9.ngx.x86_64.rpm; touch build/nginx-agent-2.19.0-SNAPSHOT-3c536cb.deb; touch build/nginx-agent.tgz; touch build/nginx-agent.rpm
+          hub release edit $(find . -type f \( -name "*.deb" -o -name "*.rpm" -o -name "*.pkg" -o -name "*.txz" -o -name "*.apk" \) -printf "-a %p\n") -m "" "$tag_name"
+      # - name: Publish Release Packages
+      #   if: ${{ inputs.publishPackages == true }}
+      #   env:
+      #     AGENT_UPLOADER_PEM: ${{ secrets.AGENT_UPLOADER_PEM }}
+      #   run: |
+      #     echo $AGENT_UPLOADER_PEM | base64 --decode > agent-uploader.pem
+      #     make release
       - name: Publish Github Release
         if: ${{ inputs.publishPackages == true }}
         uses: actions/github-script@v6
