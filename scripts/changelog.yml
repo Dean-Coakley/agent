@@ -1,3 +1,63 @@
+- semver: 0.0.6
+  date: 2022-12-08T10:05:59Z
+  packager: nginx
+  changes:
+    - commit: ec3546d05c56d5a83242b4c06be38357ea1c90a6
+      note: r14
+      author:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+      committer:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+    - commit: db939d618f58272ec31403678990b7225e6c6ed0
+      note: r13
+      author:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+      committer:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+    - commit: ba6e4a65e73662d7a1d24a5a8bec3ebdde1b8849
+      note: release 10
+      author:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+      committer:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+    - commit: aca21bbb554d51003935fab060272fbc2a8833cc
+      note: Test
+      author:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+      committer:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+    - commit: 7187b0dac6660f4dbf4cecc1b518018621692b30
+      note: Merge branch 'release-0.0.5' of github.com:Dean-Coakley/agent into release-0.0.5
+      author:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+      committer:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+    - commit: 167588dbe65ae43c651d64cf8f97f80e2ad570c8
+      note: Hardcode
+      author:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+      committer:
+        name: Dean Coakley
+        email: dean.s.coakley@gmail.com
+    - commit: 819b57f1bb6b012b2949c15a985345e7230214f0
+      note: Updating changelog
+      author:
+        name: github-actions
+        email: 41898282+github-actions[bot]@users.noreply.github.com
+      committer:
+        name: github-actions
+        email: 41898282+github-actions[bot]@users.noreply.github.com
 - semver: 0.0.5
   date: 2022-12-07T18:04:47Z
   packager: nginx

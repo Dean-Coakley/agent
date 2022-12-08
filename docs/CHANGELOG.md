@@ -1,4 +1,16 @@
 
+0.0.6
+=============
+2022-12-08
+
+* r14 (ec3546d0)
+* r13 (db939d61)
+* release 10 (ba6e4a65)
+* Test (aca21bbb)
+* Merge branch 'release-0.0.5' of github.com:Dean-Coakley/agent into release-0.0.5 (7187b0da)
+* Hardcode (167588db)
+* Updating changelog (819b57f1)
+
 0.0.5
 =============
 2022-12-07
