@@ -145,13 +145,11 @@ jobs:
       #     no-cache: true
       #     build-args: |
       #       package_type=signed-package
-      # - name: Build Packages
-      #   env:
-      #     INDIGO_GPG_AGENT: ${{ secrets.INDIGO_GPG_AGENT }}
-      #     NFPM_SIGNING_KEY_FILE: .key.asc
-      #   run: |
-      #     echo "$INDIGO_GPG_AGENT" | base64 --decode > .key.asc
-      #     make clean package
+      - name: Build Packages
+        run: |
+          make clean
+          make build-txz-packager-docker
+          make local-apk-package; make local-deb-package; make local-rpm-package; make local-txz-package;
       # - name: Azure Login
       #   uses: azure/login@v1
       #   with:
@@ -171,8 +169,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # clobber overwrites existing assets of the same name
         run: |
-          mkdir -p build/deb build/rpm
-          touch build/deb/nginx-agent_2.20.0~bionic_arm64.deb; touch build/rpm/nginx-agent-2.20.0.el9.ngx.x86_64.rpm; touch build/nginx-agent-2.19.0-SNAPSHOT-3c536cb.deb; touch build/nginx-agent.tgz; touch build/nginx-agent.rpm
           gh release upload --clobber v${{env.VERSION}} \
             $(find ./build -type f \( -name "*.deb" -o -name "*.rpm" -o -name "*.pkg" -o -name "*.txz" -o -name "*.apk" \))
       # - name: Publish Release Packages
